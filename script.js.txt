@@ -1,0 +1,31 @@
+function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 28.6, lng: 77.2 }, // New Delhi
+    zoom: 6,
+  });
+
+  fetch("affected_areas.geojson")
+    .then((res) => res.json())
+    .then((data) => {
+      map.data.addGeoJson(data);
+
+      map.data.setStyle({
+        fillColor: "red",
+        strokeColor: "darkred",
+        strokeWeight: 2,
+        fillOpacity: 0.5,
+      });
+
+      map.data.addListener("click", (event) => {
+        const name = event.feature.getProperty("name") || "Affected Area";
+        const info = new google.maps.InfoWindow({
+          content: `<strong>${name}</strong>`,
+          position: event.latLng,
+        });
+        info.open(map);
+      });
+    })
+    .catch((err) => {
+      console.error("Error loading GeoJSON:", err);
+    });
+}
